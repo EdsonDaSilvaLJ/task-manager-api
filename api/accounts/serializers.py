@@ -23,3 +23,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     self.pop('password2') #retirar do validated_data
     return User.objects.create(**validated_data)
     
+
+class UserSerializer(serializers.ModelSerializer):
+    """Serializer de leitura — retorna os dados do usuário logado."""
+    class Meta:
+        model  = User
+        fields = ["id", "email", "name", "created_at"]
+        read_only_fields = fields
