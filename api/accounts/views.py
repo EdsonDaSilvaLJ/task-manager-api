@@ -29,11 +29,3 @@ class MeView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user  # sempre retorna o usuário do token
 
-
-class LoginView(TokenObtainPairView):
-    """
-    POST /api/accounts/login/
-    Recebe email + senha, retorna access + refresh token.
-    Herda tudo do Simple JWT — só estamos nomeando a view.
-    """
-    permission_classes = [permissions.AllowAny]
