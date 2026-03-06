@@ -31,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
   #DEFINIR OS OBRIGATÓRIOS usernamefield pro authenticate que usa o AbstractBaseUser.get_by_natural_key
   USERNAME_FIELD = 'email'
-  REQUIRED_FIELDS = 'name'
+  REQUIRED_FIELDS = ['name'] #campos obrigatórios além do fieldusername e password
 
   def __str__(self):
     return self.email
