@@ -20,8 +20,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     return attrs
     
   def create(self, validated_data):
-    self.pop('password2') #retirar do validated_data
-    return User.objects.create(**validated_data)
+    validated_data.pop('password2') #retirar do validated_data
+    return User.objects.create_user(**validated_data) # Create user quando se trata de usuário, porque la dentro ele faz um set_password
     
 
 class UserSerializer(serializers.ModelSerializer):
