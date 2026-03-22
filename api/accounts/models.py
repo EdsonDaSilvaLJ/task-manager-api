@@ -23,7 +23,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
   email = models.EmailField(unique=True) #Unique True porque vai ser username_field
   name = models.CharField(max_length=150)
-  is_active = models.BooleanField(default=False) # create super user do meu manager usa
+  is_active = models.BooleanField(default=True) # create super user do meu manager usa
   is_staff = models.BooleanField(default=False) #create super user do meu manager usa
   created_at = models.DateTimeField(auto_now_add=True)
 

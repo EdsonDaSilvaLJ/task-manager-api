@@ -30,9 +30,9 @@ class Task(models.Model):
   #usa o get_field_display próprio do django ja lidando com erros
 
   class Status(models.TextChoices):
-    TODO = 'TODO', 'A Fazer'
-    IN_PROGRESS = 'IN_PROGRESS', 'Em Progresso'
-    DONE = 'DONE', 'Feito'
+    TODO = 'todo', 'A fazer'
+    IN_PROGRESS = 'in_progress', 'Em Progresso'
+    DONE = 'done', 'Feito'
 
   project = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='tasks')
   title = models.CharField(max_length=200)
