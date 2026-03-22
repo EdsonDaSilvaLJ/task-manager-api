@@ -192,6 +192,132 @@ curl -X POST http://localhost/api/tasks/ \
 
 ---
 
+## Using as a Backend for Frontend Projects
+
+This API is ready to be consumed by any frontend application (React, Vue, Next.js, etc.). Here's everything you need to get started.
+
+### 1. Start the API
+
+```bash
+git clone https://github.com/your-username/task-manager-api.git
+cd task-manager-api
+cp api/.env.example api/.env
+docker compose up --build
+```
+
+The API will be available at `http://localhost`.
+
+### 2. Authentication flow
+
+```js
+// Register
+const res = await fetch('http://localhost/api/accounts/register/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    name: 'John Doe',
+    password1: 'mypassword123',
+    password2: 'mypassword123',
+  }),
+});
+
+// Login — store the tokens
+const { access, refresh } = await fetch('http://localhost/api/accounts/login/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: 'user@example.com', password: 'mypassword123' }),
+}).then(r => r.json());
+
+localStorage.setItem('access', access);
+localStorage.setItem('refresh', refresh);
+```
+
+### 3. Authenticated requests
+
+```js
+const token = localStorage.getItem('access');
+
+// fetch projects
+const projects = await fetch('http://localhost/api/projects/', {
+  headers: { 'Authorization': `Bearer ${token}` },
+}).then(r => r.json());
+
+// create a task
+await fetch('http://localhost/api/tasks/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    title: 'Build login page',
+    priority: 'H',
+    status: 'TODO',
+    project: 1,
+  }),
+});
+```
+
+### 4. Refresh the access token
+
+Access tokens expire after 30 minutes. Refresh them silently in the background:
+
+```js
+const { access } = await fetch('http://localhost/api/accounts/token/refresh/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ refresh: localStorage.getItem('refresh') }),
+}).then(r => r.json());
+
+localStorage.setItem('access', access);
+```
+
+### 5. Logout
+
+```js
+await fetch('http://localhost/api/accounts/token/blacklist/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('access')}`,
+  },
+  body: JSON.stringify({ refresh: localStorage.getItem('refresh') }),
+});
+
+localStorage.removeItem('access');
+localStorage.removeItem('refresh');
+```
+
+### CORS
+
+If your frontend runs on a different port (e.g. `http://localhost:3000`), you'll need to enable CORS. Install and configure `django-cors-headers`:
+
+```bash
+pip install django-cors-headers
+```
+
+Add to `api/core/settings.py`:
+
+```python
+INSTALLED_APPS = [
+    ...
+    'corsheaders',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # must be before CommonMiddleware
+    'django.middleware.common.CommonMiddleware',
+    ...
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # your frontend URL
+]
+```
+
+---
+
 ## Running Tests
 
 ```bash
