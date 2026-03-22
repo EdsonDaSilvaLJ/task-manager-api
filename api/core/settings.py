@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+from decouple import config, Csv
 from pathlib import Path
 from datetime import timedelta
 
@@ -21,12 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i!sm*)=x&6g)_&uiptldlz=y#ar7v3%$a37o1d_sww#$2#@le@'
-
+SECRET_KEY = config("SECRET_KEY", cast=str)
+DEBUG = config("DEBUG", cast=bool, default=False)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv(), default="")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -78,12 +77,6 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation
@@ -130,7 +123,7 @@ AUTH_USER_MODEL = 'accounts.user'
 
 REST_FRAMEWORK = {
   "DEFAULT_AUTHENTICATE_CLASSES" : (
-    'rest_framework_simplejwt.authentication.AuthenticationJWT'
+    'rest_framework_simplejwt.authentication.JWTAuthentication'
   ),
   "DEFAULT_PERMISSION_CLASSES": (
     'rest_framework.permissions.IsAuthenticated'
@@ -143,3 +136,21 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME" : timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(hours=8),
 }
+
+
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME":     config("DB_NAME"),
+        "USER":     config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST":     config("DB_HOST"),
+        "PORT":     config("DB_PORT", default=5432, cast=int),
+    }
+}
+
+
+# Arquivos estáticos (necessário com Nginx)
+STATIC_URL  = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
